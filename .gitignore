@@ -5,8 +5,7 @@ models/
 
 # Outputs
 outputs/
-eval/results/
-eval/logs/
+
 
 # Python
 __pycache__/

@@ -1,0 +1,207 @@
+{
+  "model": "Qwen/Qwen3-8B",
+  "stage": "baseline_pre_finetune",
+  "precision": "bf16",
+  "overall_accuracy": 1.0,
+  "per_category": {
+    "param_extraction": 1.0,
+    "ambiguous": 1.0,
+    "refusal": 1.0,
+    "simple": 1.0
+  },
+  "results": [
+    {
+      "id": "simple_01",
+      "category": "simple",
+      "query": "What's the weather in Tampa, Florida?",
+      "raw_response": "<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"location\": \"Tampa, Florida\"}}\n</tool_call>",
+      "tool_calls": [
+        {
+          "name": "get_weather",
+          "arguments": {
+            "location": "Tampa, Florida"
+          }
+        }
+      ],
+      "scores": {
+        "format_valid": true,
+        "name_correct": true,
+        "param_accuracy": 1.0,
+        "hallucinated_params": 0,
+        "overall": 1.0
+      },
+      "gen_time_s": 2.052583932876587
+    },
+    {
+      "id": "simple_02",
+      "category": "simple",
+      "query": "Find me books under $20 about machine learning",
+      "raw_response": "<tool_call>\n{\"name\": \"search_products\", \"arguments\": {\"query\": \"machine learning\", \"max_price\": 20, \"category\": \"books\"}}\n</tool_call>",
+      "tool_calls": [
+        {
+          "name": "search_products",
+          "arguments": {
+            "query": "machine learning",
+            "max_price": 20,
+            "category": "books"
+          }
+        }
+      ],
+      "scores": {
+        "format_valid": true,
+        "name_correct": true,
+        "param_accuracy": 1.0,
+        "hallucinated_params": 0,
+        "overall": 1.0
+      },
+      "gen_time_s": 3.079721212387085
+    },
+    {
+      "id": "simple_03",
+      "category": "simple",
+      "query": "Send an email to bob@example.com with subject 'Meeting Tomorrow' saying 'Can we reschedule to 3pm?'",
+      "raw_response": "<tool_call>\n{\"name\": \"send_email\", \"arguments\": {\"to\": \"bob@example.com\", \"subject\": \"Meeting Tomorrow\", \"body\": \"Can we reschedule to 3pm?\"}}\n</tool_call>",
+      "tool_calls": [
+        {
+          "name": "send_email",
+          "arguments": {
+            "to": "bob@example.com",
+            "subject": "Meeting Tomorrow",
+            "body": "Can we reschedule to 3pm?"
+          }
+        }
+      ],
+      "scores": {
+        "format_valid": true,
+        "name_correct": true,
+        "param_accuracy": 1.0,
+        "hallucinated_params": 0,
+        "overall": 1.0
+      },
+      "gen_time_s": 3.769197702407837
+    },
+    {
+      "id": "simple_04",
+      "category": "simple",
+      "query": "Calculate the monthly payment for a $350,000 mortgage at 6.5% over 30 years",
+      "raw_response": "<tool_call>\n{\"name\": \"calculate_mortgage\", \"arguments\": {\"principal\": 350000, \"annual_rate\": 6.5, \"term_years\": 30}}\n</tool_call>",
+      "tool_calls": [
+        {
+          "name": "calculate_mortgage",
+          "arguments": {
+            "principal": 350000,
+            "annual_rate": 6.5,
+            "term_years": 30
+          }
+        }
+      ],
+      "scores": {
+        "format_valid": true,
+        "name_correct": true,
+        "param_accuracy": 1.0,
+        "hallucinated_params": 0,
+        "overall": 1.0
+      },
+      "gen_time_s": 3.8567452430725098
+    },
+    {
+      "id": "param_01",
+      "category": "param_extraction",
+      "query": "What's the temperature in Tokyo in fahrenheit?",
+      "raw_response": "<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"location\": \"Tokyo\", \"unit\": \"fahrenheit\"}}\n</tool_call>",
+      "tool_calls": [
+        {
+          "name": "get_weather",
+          "arguments": {
+            "location": "Tokyo",
+            "unit": "fahrenheit"
+          }
+        }
+      ],
+      "scores": {
+        "format_valid": true,
+        "name_correct": true,
+        "param_accuracy": 1.0,
+        "hallucinated_params": 0,
+        "overall": 1.0
+      },
+      "gen_time_s": 2.4865095615386963
+    },
+    {
+      "id": "param_02",
+      "category": "param_extraction",
+      "query": "Search for electronics",
+      "raw_response": "<tool_call>\n{\"name\": \"search_products\", \"arguments\": {\"query\": \"electronics\", \"category\": \"electronics\"}}\n</tool_call>",
+      "tool_calls": [
+        {
+          "name": "search_products",
+          "arguments": {
+            "query": "electronics",
+            "category": "electronics"
+          }
+        }
+      ],
+      "scores": {
+        "format_valid": true,
+        "name_correct": true,
+        "param_accuracy": 1.0,
+        "hallucinated_params": 1,
+        "overall": 1.0
+      },
+      "gen_time_s": 2.3133418560028076
+    },
+    {
+      "id": "refusal_01",
+      "category": "refusal",
+      "query": "What's the capital of France?",
+      "raw_response": "The capital of France is Paris.",
+      "tool_calls": [],
+      "scores": {
+        "refusal_correct": true,
+        "overall": 1.0
+      },
+      "gen_time_s": 0.7769370079040527
+    },
+    {
+      "id": "refusal_02",
+      "category": "refusal",
+      "query": "Tell me a joke",
+      "raw_response": "I don't have the capability to tell jokes, but I can help you with weather, product searches, sending emails, or calculating mortgages! Let me know how I can assist. 😊",
+      "tool_calls": [],
+      "scores": {
+        "refusal_correct": true,
+        "overall": 1.0
+      },
+      "gen_time_s": 3.4246985912323
+    },
+    {
+      "id": "ambig_01",
+      "category": "ambiguous",
+      "query": "I need to know about the weather for my trip to London and also find waterproof jackets under $100",
+      "raw_response": "<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"location\": \"London\", \"unit\": \"celsius\"}}\n</tool_call>\n<tool_call>\n{\"name\": \"search_products\", \"arguments\": {\"query\": \"waterproof jackets\", \"max_price\": 100, \"category\": \"clothing\"}}\n</tool_call>",
+      "tool_calls": [
+        {
+          "name": "get_weather",
+          "arguments": {
+            "location": "London",
+            "unit": "celsius"
+          }
+        },
+        {
+          "name": "search_products",
+          "arguments": {
+            "query": "waterproof jackets",
+            "max_price": 100,
+            "category": "clothing"
+          }
+        }
+      ],
+      "scores": {
+        "made_calls": true,
+        "multiple_calls": true,
+        "overall": 1.0
+      },
+      "gen_time_s": 5.652605772018433
+    }
+  ]
+}

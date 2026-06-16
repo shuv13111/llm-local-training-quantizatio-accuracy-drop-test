@@ -1,0 +1,124 @@
+[
+  {
+    "question": "How cold is it in Reykjavik in celsius?",
+    "expected": {
+      "tool": "get_weather",
+      "arguments": {
+        "location": "Reykjavik",
+        "unit": "celsius"
+      }
+    },
+    "got": {
+      "tool": "get_weather",
+      "arguments": {
+        "location": "Reykjavik",
+        "unit": "celsius"
+      }
+    }
+  },
+  {
+    "question": "Find me cheap electronics under 50 bucks",
+    "expected": {
+      "tool": "search_products",
+      "arguments": {
+        "query": "electronics",
+        "max_price": 50,
+        "category": "electronics"
+      }
+    },
+    "got": {
+      "tool": "search_products",
+      "arguments": {
+        "query": "electronics",
+        "max_price": 50,
+        "category": "electronics"
+      }
+    }
+  },
+  {
+    "question": "Email alice@corp.com subject 'Q3 Report' body 'Attached the draft, please review by Friday'",
+    "expected": {
+      "tool": "send_email",
+      "arguments": {
+        "to": "alice@corp.com",
+        "subject": "Q3 Report",
+        "body": "Attached the draft, please review by Friday"
+      }
+    },
+    "got": {
+      "tool": "send_email",
+      "arguments": {
+        "to": "alice@corp.com",
+        "subject": "Q3 Report",
+        "body": "Attached the draft, please review by Friday"
+      }
+    }
+  },
+  {
+    "question": "What's the monthly on a 500k loan at 7.25% for 15 years?",
+    "expected": {
+      "tool": "calculate_mortgage",
+      "arguments": {
+        "principal": 500000,
+        "annual_rate": 7.25,
+        "term_years": 15
+      }
+    },
+    "got": {
+      "tool": "calculate_mortgage",
+      "arguments": {
+        "principal": 500000,
+        "annual_rate": 7.25,
+        "term_years": 15
+      }
+    }
+  },
+  {
+    "question": "Who won the 1998 World Cup?",
+    "expected": {
+      "tool": null,
+      "answer": "France won the 1998 FIFA World Cup."
+    },
+    "got": {
+      "tool": null,
+      "answer": "The 1998 FIFA World Cup was won by France. They defeated Brazil 3-0 in the final, which was held in Paris, France."
+    }
+  },
+  {
+    "question": "Check the weather in Berlin and also find me books about German history under $30",
+    "expected": [
+      {
+        "tool": "get_weather",
+        "arguments": {
+          "location": "Berlin",
+          "unit": "celsius"
+        }
+      },
+      {
+        "tool": "search_products",
+        "arguments": {
+          "query": "German history",
+          "max_price": 30,
+          "category": "books"
+        }
+      }
+    ],
+    "got": [
+      {
+        "tool": "get_weather",
+        "arguments": {
+          "location": "Berlin",
+          "unit": "celsius"
+        }
+      },
+      {
+        "tool": "search_products",
+        "arguments": {
+          "query": "German history",
+          "max_price": 30,
+          "category": "books"
+        }
+      }
+    ]
+  }
+]
