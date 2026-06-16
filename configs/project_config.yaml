@@ -1,0 +1,186 @@
+# ============================================================
+# Project Configuration
+# LLM Function Calling: Fine-Tune, Quantize, Benchmark
+# ============================================================
+
+project:
+  name: "llm-fc-quantize-benchmark"
+  description: "Fine-tune LLMs for function calling, quantize, and benchmark degradation"
+
+# ── Models ───────────────────────────────────────────────────
+models:
+  dense:
+    name: "Qwen/Qwen3-8B"
+    short_name: "qwen3-8b"
+    architecture: "dense"
+    params: "8B"
+    base_dir: "models/base/qwen3-8b"
+    finetuned_dir: "models/finetuned/qwen3-8b-fc"
+
+  moe:
+    name: "google/gemma-4-26b-a4b-it"    # verify exact HF repo name before downloading
+    short_name: "gemma4-26b-a4b"
+    architecture: "moe"
+    params: "26B total / 3.8B active"
+    base_dir: "models/base/gemma4-26b-a4b"
+    finetuned_dir: "models/finetuned/gemma4-26b-a4b-fc"
+
+# ── Datasets ─────────────────────────────────────────────────
+datasets:
+  glaive:
+    hf_repo: "glaiveai/glaive-function-calling-v2"
+    split: "train"
+    expected_size: 113000   # approximate
+    license: "Apache-2.0"
+
+  xlam:
+    hf_repo: "Salesforce/xlam-function-calling-60k"
+    split: "train"
+    expected_size: 60000
+    license: "Research only (gated)"
+
+  # BFCL is an eval harness, not a dataset to load
+  bfcl:
+    github_repo: "ShishirPatil/gorilla"
+    subdir: "berkeley-function-call-leaderboard"
+    version: "v4"
+
+data_processing:
+  train_val_split: 0.9          # 90% train, 10% validation
+  seed: 42
+  max_seq_length: 4096          # adjust after inspecting token distributions
+  shuffle: true                  # mix Glaive + xLAM into single shuffled set
+
+# ── Training (LoRA) ──────────────────────────────────────────
+training:
+  # Shared across both models (adjust per-model if needed)
+  lora:
+    r: 64
+    alpha: 128
+    dropout: 0.05
+    # For Qwen3 8B (dense):
+    target_modules_dense:
+      - "q_proj"
+      - "k_proj"
+      - "v_proj"
+      - "o_proj"
+      - "gate_proj"
+      - "up_proj"
+      - "down_proj"
+    # For Gemma 4 26B A4B (MoE) — verify actual layer names before training:
+    target_modules_moe:
+      - "q_proj"
+      - "k_proj"
+      - "v_proj"
+      - "o_proj"
+      - "gate_proj"
+      - "up_proj"
+      - "down_proj"
+      # Add expert-specific modules here if baseline results are weak
+
+  hyperparams:
+    learning_rate: 2.0e-4
+    lr_scheduler: "cosine"
+    warmup_steps: 100
+    num_epochs: 3
+    per_device_train_batch_size: 4
+    gradient_accumulation_steps: 8    # effective batch size = 4 * 8 = 32
+    weight_decay: 0.01
+    max_grad_norm: 1.0
+    bf16: true
+    gradient_checkpointing: true
+
+  # bitsandbytes 8-bit optimizer — set to false if bnb doesn't work on aarch64
+  use_8bit_optimizer: true
+
+  # Output
+  save_strategy: "steps"
+  save_steps: 500
+  eval_steps: 250
+  logging_steps: 50
+
+# ── Quantization ─────────────────────────────────────────────
+quantization:
+  output_dir: "models/quantized"
+
+  levels:
+    - name: "bf16"
+      format: "BrainFloat 16"
+      tool: "baseline"
+      enabled: true
+
+    - name: "fp8"
+      format: "Float 8 (E4M3)"
+      tool: "tensorrt-model-optimizer"
+      enabled: true
+
+    - name: "nvfp4"
+      format: "NVIDIA Float 4"
+      tool: "tensorrt-model-optimizer"
+      enabled: true
+      # Use: huggingface_example.sh --quant nvfp4 --export_fmt hf
+      # Inside: nvcr.io/nvidia/tensorrt-llm container
+
+    - name: "gptq-q4"
+      format: "4-bit grouped"
+      tool: "gptqmodel"
+      bits: 4
+      group_size: 128
+      enabled: true
+
+    - name: "awq-q4"
+      format: "4-bit activation-aware"
+      tool: "autoawq"
+      bits: 4
+      group_size: 128
+      enabled: true
+
+    - name: "gguf-q4km"
+      format: "4-bit k-quant mixed"
+      tool: "llama.cpp"
+      quant_type: "Q4_K_M"
+      enabled: true
+
+    - name: "gguf-q3km"
+      format: "3-bit k-quant mixed"
+      tool: "llama.cpp"
+      quant_type: "Q3_K_M"
+      enabled: true
+
+    - name: "gguf-q2k"
+      format: "2-bit k-quant"
+      tool: "llama.cpp"
+      quant_type: "Q2_K"
+      enabled: true
+
+# ── Evaluation ───────────────────────────────────────────────
+evaluation:
+  bfcl:
+    mode: "prompt"              # "prompt" or "fc" — be consistent across all models
+    num_runs: 3                  # run each model 3x for variance estimation
+    results_dir: "eval/results"
+    logs_dir: "eval/logs"
+
+  metrics:
+    - "format_validity"          # does output parse as valid function call?
+    - "function_name_accuracy"   # correct function selected?
+    - "parameter_accuracy"       # correct argument values?
+    - "parameter_type_accuracy"  # string/int/float types preserved?
+    - "multi_call_accuracy"      # parallel / sequential calls correct?
+    - "hallucinated_params"      # invented arguments?
+    - "refusal_accuracy"         # correctly declined when no function matches?
+
+  performance:
+    - "tokens_per_second"
+    - "time_to_first_token"
+    - "peak_memory_mb"
+    - "model_size_mb"
+
+# ── W&B / Logging ────────────────────────────────────────────
+wandb:
+  project: "llm-fc-quantize-benchmark"
+  entity: null                   # set to your W&B username/org
+  tags:
+    - "function-calling"
+    - "quantization"
+    - "dgx-spark"

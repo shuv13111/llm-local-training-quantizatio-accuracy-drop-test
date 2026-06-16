@@ -1,0 +1,52 @@
+# ============================================================
+# LLM Function Calling: Fine-Tune, Quantize, Benchmark
+# Requirements for NVIDIA DGX Spark (aarch64 / Grace Blackwell)
+# ============================================================
+
+# Core training stack
+transformers>=4.46.0
+peft>=0.13.0
+trl>=0.12.0
+datasets>=3.0.0
+accelerate>=1.0.0
+
+# Optimizers & quantization for training
+bitsandbytes>=0.44.0        # VERIFY: run `python -c "import bitsandbytes"` after install — aarch64 support is patchy
+
+# Quantization tools (install separately after verifying base stack)
+# gptqmodel                 # pip install gptqmodel — install AFTER confirming CUDA works
+# autoawq                   # pip install autoawq — verify aarch64 wheel exists
+
+# Evaluation
+scipy>=1.11.0
+
+# Tokenizer dependencies
+sentencepiece>=0.2.0
+protobuf>=4.25.0
+
+# Logging & tracking
+wandb>=0.18.0
+
+# Data processing
+pandas>=2.1.0
+numpy>=1.26.0
+
+# Visualization (for results analysis)
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Utilities
+huggingface_hub>=0.25.0
+safetensors>=0.4.0
+tqdm>=4.66.0
+pyyaml>=6.0.0
+jsonlines>=4.0.0
+
+# GGUF conversion (llama.cpp python bindings)
+# llama-cpp-python           # build from source on aarch64: CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python
+
+# ============================================================
+# NOT installed via pip (use NVIDIA containers instead):
+#   - tensorrt-llm            → nvcr.io/nvidia/tensorrt-llm container
+#   - tensorrt-model-optimizer → comes inside the TRT-LLM container
+# ============================================================
